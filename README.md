@@ -1,78 +1,453 @@
-# 🍃 Breathe ESG: Emissions Data Ingestion Pipeline
+# Breathe ESG Platform
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)
-![Django](https://img.shields.io/badge/Django-5.0-092E20?style=for-the-badge&logo=django)
-![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)
-![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?style=for-the-badge&logo=render)
+A production-style ESG (Environmental, Social, Governance) data ingestion and audit platform built with Django, Django REST Framework, React, and Tailwind CSS.
 
-A full-stack prototype application built for the **Breathe ESG Tech Intern Assignment**. This application serves as a robust data ingestion pipeline capable of accepting raw, disparate emissions data from various enterprise sources, normalizing it, and providing a clean audit trail.
+The system ingests sustainability-related operational data from multiple enterprise systems, normalizes records into a consistent schema, validates suspicious entries, and supports analyst review workflows with auditability.
 
 ---
 
-## 🚀 Live Demo
-The application is fully deployed and accessible here:
-**[https://breathe-esg-ingestion.onrender.com/](https://breathe-esg-ingestion.onrender.com/)**
+# Features
+
+## ESG Data Ingestion
+
+Supports ingestion from:
+
+* SAP procurement/fuel exports
+* Utility electricity billing exports
+* Corporate travel systems (Concur-style payloads)
 
 ---
 
-## 🏗 Architecture & Documentation
-As requested in the assignment rubric, the technical decision-making and architectural designs have been thoroughly documented in the following files:
+## Validation & Review Workflow
 
-- 🗄️ **[MODEL.md](./MODEL.md)**: Details the database schema, multi-tenancy, Scope categorization, and how the `raw_payload` drives absolute auditability.
-- 🤔 **[DECISIONS.md](./DECISIONS.md)**: Outlines ambiguities encountered, parsing decisions for SAP/Utility/Concur data, and questions for the Product Manager.
-- ⚖️ **[TRADEOFFS.md](./TRADEOFFS.md)**: Explains what was deliberately scoped out of this 4-day prototype (e.g., real OAuth, Celery workers) and why.
-- 🔍 **[SOURCES.md](./SOURCES.md)**: Discusses the real-world formatting of the three targeted data sources and provides sample CSV/JSON structures.
+The platform detects:
+
+* invalid dates
+* unsupported units
+* suspicious quantities
+* malformed records
+* incomplete travel data
+
+Records are routed into a review workflow where analysts can:
+
+* inspect validation issues
+* approve records
+* reject records
+* maintain audit history
 
 ---
 
-## 💻 Tech Stack
-* **Frontend:** React, TypeScript, Vite, Tailwind CSS, Lucide Icons
-* **Backend:** Python, Django, Django REST Framework
-* **Database:** SQLite (Prototype)
-* **Deployment:** Docker, Render
+## Multi-Tenant Architecture
+
+Each organization operates in an isolated tenant context.
+
+Supported through:
+
+* tenant-based record ownership
+* isolated uploads
+* tenant-scoped ESG records
 
 ---
 
-## 🛠️ Local Development Setup
+## Auditability
 
-To run this project locally, you can use the provided `Dockerfile` or run the frontend and backend manually.
+Every normalized record maintains:
 
-### Option 1: Docker (Recommended)
-1. Ensure Docker is installed and running.
-2. Build the image:
-   ```bash
-   docker build -t breathe-esg .
-   ```
-3. Run the container:
-   ```bash
-   docker run -p 8000:8000 breathe-esg
-   ```
-4. Access the application at `http://localhost:8000`.
+* original raw payload
+* validation metadata
+* review status
+* analyst edits
+* audit log tracking
 
-### Option 2: Manual Setup
+This mirrors real-world ESG assurance and compliance workflows.
 
-**Backend (Django):**
+---
+
+# Tech Stack
+
+## Backend
+
+* Django
+* Django REST Framework
+* PostgreSQL (production)
+* SQLite (local development)
+* pandas
+
+## Frontend
+
+* React
+* TypeScript
+* Tailwind CSS
+* Axios
+* Vite
+
+## Deployment
+
+* Backend → Render
+* Frontend → Vercel
+
+---
+
+# Project Structure
+
+```bash
+breathe-esg-platform/
+│
+├── backend/
+│   ├── config/
+│   ├── ingestion/
+│   ├── requirements.txt
+│   └── manage.py
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── sample_data/
+├── Screenshots/
+├── README.md
+├── MODEL.md
+├── DECISIONS.md
+├── TRADEOFFS.md
+├── SOURCES.md
+└── render.yaml
+```
+
+---
+
+# ESG Workflow Overview
+
+## 1. Upload Operational Data
+
+Users upload:
+
+* SAP CSV exports
+* Utility billing CSVs
+* Travel JSON payloads
+
+---
+
+## 2. Normalize Data
+
+The backend transforms heterogeneous source data into a standardized emissions activity structure.
+
+Examples:
+
+* SAP fuel → Scope 3 activity
+* Utility electricity → Scope 2 activity
+* Travel mileage → Scope 3 travel activity
+
+---
+
+## 3. Validation
+
+The ingestion layer validates:
+
+* dates
+* units
+* quantities
+* required fields
+
+Invalid records are flagged instead of rejected outright.
+
+---
+
+## 4. Analyst Review
+
+Analysts review:
+
+* pending records
+* validation warnings
+* suspicious activity
+
+Records may be:
+
+* APPROVED
+* REJECTED
+* FLAGGED
+
+---
+
+## 5. Audit Trail
+
+All changes are tracked through AuditLog entries for traceability and compliance review.
+
+---
+
+# Local Development Setup
+
+# 1. Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/breathe-esg-platform.git
+cd breathe-esg-platform
+```
+
+---
+
+# 2. Backend Setup
+
+## Create Virtual Environment
+
 ```bash
 cd backend
+
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+Activate virtual environment:
+
+### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+### Mac/Linux
+
+```bash
+source .venv/bin/activate
+```
+
+---
+
+## Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+---
+
+## Run Migrations
+
+```bash
 python manage.py migrate
+```
+
+---
+
+## Create Superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+---
+
+## Start Backend Server
+
+```bash
 python manage.py runserver
 ```
 
-**Frontend (React/Vite):**
-```bash
-cd frontend
-npm install
-npm run dev
+Backend runs at:
+
+```text
+http://127.0.0.1:8000
 ```
 
 ---
 
-## ✨ Key Features
-* **Multi-Source Ingestion:** Seamlessly handles SAP Procurement CSVs, Utility Electricity bills, and Concur Travel API JSON payloads.
-* **Audit Trail Security:** Retains the exact original data row as a `raw_payload` JSON alongside the normalized metrics. Tracks every manual analyst edit.
-* **Resilient Parsing:** Never drops data. Invalid values or unmapped plants are flagged in a `validation_errors` JSON column, allowing analysts to fix them manually in the UI rather than failing the upload.
+# 3. Frontend Setup
+
+Open another terminal:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run frontend:
+
+```bash
+npm run dev
+```
+
+Frontend runs at:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# Django Admin
+
+Admin panel available at:
+
+```text
+http://127.0.0.1:8000/admin
+```
+
+Use the superuser credentials created earlier.
+
+The admin panel allows:
+
+* tenant management
+* upload inspection
+* audit review
+* normalized record inspection
+
+---
+
+# Sample Data
+
+Sample datasets are available in:
+
+```text
+sample_data/
+```
+
+Included:
+
+* sap_procurement.csv
+* utility_electricity.csv
+* travel_data.csv
+
+These intentionally include:
+
+* malformed dates
+* suspicious quantities
+* inconsistent units
+* incomplete records
+
+to exercise validation workflows realistically.
+
+---
+
+# Deployment
+
+# Backend Deployment (Render)
+
+## Create Render Web Service
+
+Connect GitHub repository:
+
+* Root Directory → `backend`
+* Build Command:
+
+```bash
+pip install -r requirements.txt
+```
+
+* Start Command:
+
+```bash
+gunicorn config.wsgi
+```
+
+---
+
+## Environment Variables
+
+Add:
+
+```env
+SECRET_KEY=your-secret-key
+DEBUG=False
+ALLOWED_HOSTS=your-render-domain.onrender.com
+DATABASE_URL=your-postgres-url
+```
+
+---
+
+# Frontend Deployment (Vercel)
+
+Import GitHub repository into Vercel.
+
+## Root Directory
+
+```text
+frontend
+```
+
+## Build Command
+
+```bash
+npm run build
+```
+
+## Output Directory
+
+```text
+dist
+```
+
+---
+
+# Update API Base URL
+
+Update frontend API config:
+
+```ts
+const API_BASE = "https://your-render-backend-url.onrender.com/api";
+```
+
+---
+
+# Production Considerations
+
+This prototype intentionally excludes:
+
+* OAuth integrations
+* asynchronous task queues
+* emissions factor engines
+* advanced RBAC
+* configurable schema mapping
+
+The focus is operational ESG ingestion workflows:
+
+* ingestion
+* normalization
+* validation
+* analyst review
+* auditability
+
+---
+
+# Future Improvements
+
+Potential future enhancements:
+
+* Celery background workers
+* airport geolocation lookups
+* emissions factor libraries
+* configurable ingestion templates
+* automated anomaly detection
+* SSO/OAuth integration
+* tenant-level permissions
+
+---
+
+# Screenshots
+
+Screenshots available in:
+
+```text
+Screenshots/
+```
+
+---
+
+# Documentation
+
+Additional project documentation:
+
+* MODEL.md
+* DECISIONS.md
+* TRADEOFFS.md
+* SOURCES.md
+
+---
+
+# License
+
+This project was built as part of a technical internship assignment focused on ESG operational data ingestion workflows.
