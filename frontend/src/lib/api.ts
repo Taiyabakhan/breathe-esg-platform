@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : '/api';
-const API_BASE = "https://breathe-esg-platform-2q45.onrender.com";
+const API_BASE = "https://breathe-esg-platform-2q45.onrender.com/api";
 
 export const api = axios.create({
   baseURL: API_BASE,
