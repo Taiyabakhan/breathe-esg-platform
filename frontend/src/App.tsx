@@ -8,7 +8,6 @@ import {
   Upload,
   ShieldAlert,
   FileCheck,
-  Building2,
   Activity,
 } from 'lucide-react';
 
