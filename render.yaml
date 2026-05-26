@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: breathe-esg-ingestion
+    env: docker
+    plan: free
+    dockerCommand: "bash start.sh"
